@@ -1,0 +1,51 @@
+{
+    "name": "goodwillContracts",
+    "private": true,
+    "version": "0.1.0",
+    "description": "Goodwill Contracts...",
+    "scripts": {
+      "build": "exit 0",
+      "test": "tape -r esm 'test/**/*.test.js' | tap-spec",
+      "lint": "eslint '**/*.{js,jsx}'",
+      "lint-fix": "eslint --fix '**/*.{js,jsx}'",
+      "lint-check": "eslint '**/*.{js,jsx}'",
+      "lint-fix-jessie": "eslint -c '.eslintrc-jessie.js' --fix '**/*.{js,jsx}'",
+      "lint-check-jessie": "eslint -c '.eslintrc-jessie.js' '**/*.{js,jsx}'"
+    },
+    "devDependencies": {
+      "eslint": "^6.1.0",
+      "eslint-config-airbnb-base": "^14.0.0",
+      "eslint-config-jessie": "0.0.3",
+      "eslint-config-prettier": "^6.0.0",
+      "eslint-plugin-import": "^2.18.2",
+      "eslint-plugin-prettier": "^3.1.0",
+      "prettier": "^1.18.2",
+      "tap-spec": "^5.0.0",
+      "tape": "^4.11.0",
+      "tape-promise": "^4.0.0"
+    },
+    "dependencies": {
+    "@agoric/babel-parser": "^7.6.4",
+    "@agoric/notifier": "0.1.0",
+    "@agoric/assert": "^0.0.3",
+    "@agoric/bundle-source": "^1.1.1",
+    "@agoric/ertp": "^0.5.1",
+    "@agoric/eventual-send": "^0.7.0",
+    "@agoric/harden": "0.0.4",
+    "@agoric/make-promise": "^0.0.3",
+    "@agoric/nat": "^3.0.1",
+    "@agoric/registrar": "^0.0.3",
+    "@agoric/same-structure": "^0.0.3",
+    "@agoric/store": "^0.0.3",
+    "@agoric/zoe": "0.6.0",
+    "esm": "^3.2.5"
+    },
+    "eslintConfig": {
+      "extends": [
+        "../.eslintrc.js"
+      ]
+    },
+    "keywords": [],
+    "author": "GMU CEL",
+    "license": "Apache-2.0"
+  }
