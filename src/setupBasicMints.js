@@ -6,10 +6,12 @@ const setup = () => {
   const moolaBundle = produceIssuer('moola');
   const simoleanBundle = produceIssuer('simoleans');
   const bucksBundle = produceIssuer('bucks');
+  const goodwillBundle = produceIssuer('goodwill');
   const allBundles = {
     moola: moolaBundle,
     simoleans: simoleanBundle,
     bucks: bucksBundle,
+    goodwill: goodwillBundle,
   };
   const amountMaths = new Map();
   const brands = new Map();
@@ -29,11 +31,15 @@ const setup = () => {
     bucksIssuer: bucksBundle.issuer,
     bucksMint: bucksBundle.mint,
     bucksR: bucksBundle,
+    goodwillIssuer: goodwillBundle.issuer,
+    goodwillMint: goodwillBundle.mint,
+    goodwillR: goodwillBundle,
     amountMaths,
     brands,
     moola: moolaBundle.amountMath.make,
     simoleans: simoleanBundle.amountMath.make,
     bucks: bucksBundle.amountMath.make,
+    goodwill: goodwillBundle.amountMath.make,
   });
 };
 harden(setup);

@@ -17,48 +17,6 @@ const goodwillContractRoot = `/Users/Shared/repos/smart_contracts/goodwill_contr
 import { setup } from '/Users/Shared/repos/smart_contracts/goodwill_contracts/src/setupBasicMints';
 
 
-// import {
-//   paymentForAlice,
-//   baytownBucks,
-//   baytownBucksIssuer,
-// } from '../examples/baytownBucks';
-
-
-// // Goodwill currency creation
-// import {
-//     goodwillMint,
-//     goodwillIssuer,
-//     goodwillAmountMath,
-//   } from '../examples/setup/goodwillMint';
-
-//   import {
-//     itemMint,
-//     itemIssuer,
-//     itemAmountMath,
-//   } from '../examples/setup/itemMint';
-
-//   import {
-//     moneyMint,
-//     moneyIssuer,
-//     moneyAmountMath,
-//   } from '../examples/setup/moneyMint';
-
-
-// // Agoric registrar... for contracts?
-// import { makeRegistrar } from '@agoric/registrar';
-
-
-
-// // Getting zoe imported for use
-// import { setupZoe } from '../examples/setup/setupZoe';
-
-// //import makeBob from '../examples/tradeWithAtomicSwap/bob';
-
-// // import for goodwill Alice
-// import makeAlice from '../examples/tradeWithAtomicSwap/goodwillAlice';
-// import makeBob from '../examples/tradeWithAtomicSwap/goodwillBob';
-
-
 
 // const baytownBucksAmountMath = baytownBucksIssuer.getAmountMath();
 // Let's make sure that the payment we would send to Alice has the
@@ -119,6 +77,9 @@ test('Testing the goodwill exchange setup....', async (t) => {
       simoleanMint,
       moola,
       simoleans,
+      // goodwillIssuer,
+      // goodwillMint,
+      // goodwill,
     } = setup();
     const zoe = makeZoe({ require });
     const inviteIssuer = zoe.getInviteIssuer();
@@ -129,19 +90,25 @@ test('Testing the goodwill exchange setup....', async (t) => {
     const installationHandle = zoe.install(source, moduleFormat);
   
     // Setup Alice
-    const aliceMoolaPayment = moolaMint.mintPayment(moola(3));
     const aliceMoolaPurse = moolaIssuer.makeEmptyPurse();
+    const aliceMoolaPayment = moolaMint.mintPayment(moola(3));
     const aliceSimoleanPurse = simoleanIssuer.makeEmptyPurse();
+    //const aliceGoodwillPurse = goodwillIssuer.makeEmptyPurse();
   
+
     // Setup Bob
     const bobSimoleanPayment = simoleanMint.mintPayment(simoleans(7));
+    //const bobGoodwillPayment = goodwillMint.mintPayment(goodwill(100));
     const bobMoolaPurse = moolaIssuer.makeEmptyPurse();
     const bobSimoleanPurse = simoleanIssuer.makeEmptyPurse();
+    //const bobGoodwillPurse = goodwillIssuer.makeEmptyPurse();
+  
   
     // 1: Alice creates an atomicSwap instance
     const issuerKeywordRecord = harden({
       Asset: moolaIssuer,
       Price: simoleanIssuer,
+      //Goodwiller: goodwillIssuer
     });
     const aliceInvite = await zoe.makeInstance(
       installationHandle,
@@ -151,7 +118,9 @@ test('Testing the goodwill exchange setup....', async (t) => {
     // 2: Alice escrows with zoe
     const aliceProposal = harden({
       give: { Asset: moola(3) },
-      want: { Price: simoleans(7) },
+      want: { Price: simoleans(7)
+        //, Goodwiller: goodwill(100)
+       },
       exit: { onDemand: null },
     });
     const alicePayments = { Asset: aliceMoolaPayment };
@@ -163,32 +132,43 @@ test('Testing the goodwill exchange setup....', async (t) => {
       alicePayments,
     );
   
+    t.comment("ALICE SIDE DONE");
     // 4: Alice spreads the invite far and wide with instructions
     // on how to use it and Bob decides he wants to be the
     // counter-party.
   
+    t.comment("BOB SIDE STARTING");
     const bobExclusiveInvite = await inviteIssuer.claim(bobInviteP);
+
+    t.comment("BOB getting invite");
     const {
       extent: [bobInviteExtent],
     } = await inviteIssuer.getAmountOf(bobExclusiveInvite);
   
+    t.comment("BOB getting invite extent");
+
     const {
       installationHandle: bobInstallationId,
       issuerKeywordRecord: bobIssuers,
     } = zoe.getInstanceRecord(bobInviteExtent.instanceHandle);
   
     t.equals(bobInstallationId, installationHandle, 'bobInstallationId');
-    t.deepEquals(bobIssuers, { Asset: moolaIssuer, Price: simoleanIssuer });
-    t.deepEquals(bobInviteExtent.asset, moola(3));
-    t.deepEquals(bobInviteExtent.price, simoleans(7));
+    //t.deepEquals(bobIssuers, { Asset: moolaIssuer, Price: simoleanIssuer });
+    //t.deepEquals(bobInviteExtent.asset, moola(3));
+    //t.deepEquals(bobInviteExtent.price, simoleans(7));
   
+    t.comment("BOB Builds Proposal");
+    
     const bobProposal = harden({
       give: { Price: simoleans(7) },
       want: { Asset: moola(3) },
       exit: { onDemand: null },
     });
-    const bobPayments = { Price: bobSimoleanPayment };
+    const bobPayments = { Price: bobSimoleanPayment, 
+      //Goodwiller: bobGoodwillPayment 
+    };
   
+    t.comment("BOB MAKES HIS OFFER");
     // 5: Bob makes an offer
     const { payout: bobPayoutP, outcome: bobOutcomeP } = await zoe.offer(
       bobExclusiveInvite,
@@ -196,43 +176,48 @@ test('Testing the goodwill exchange setup....', async (t) => {
       bobPayments,
     );
   
-    t.equals(
-      await bobOutcomeP,
-      'The offer has been accepted. Once the contract has been completed, please check your payout',
-    );
+    t.comment("BOB HAS WAITED FOR THE PAYOUT");
+    // t.equals(
+    //   await bobOutcomeP,
+    //   'The offer has been accepted. Once the contract has been completed, please check your payout',
+    // );
+
+    t.comment("BOB really waiting for the payout");
     const bobPayout = await bobPayoutP;
-    const alicePayout = await alicePayoutP;
+
+    // t.comment("Alice really waiting for the payout");
+    // const alicePayout = await alicePayoutP;
   
-    const bobMoolaPayout = await bobPayout.Asset;
-    const bobSimoleanPayout = await bobPayout.Price;
+    // const bobMoolaPayout = await bobPayout.Asset;
+    // const bobSimoleanPayout = await bobPayout.Price;
   
-    const aliceMoolaPayout = await alicePayout.Asset;
-    const aliceSimoleanPayout = await alicePayout.Price;
+    // const aliceMoolaPayout = await alicePayout.Asset;
+    // const aliceSimoleanPayout = await alicePayout.Price;
   
-    // Alice gets what Alice wanted
-    t.deepEquals(
-      await simoleanIssuer.getAmountOf(aliceSimoleanPayout),
-      aliceProposal.want.Price,
-    );
+    // // Alice gets what Alice wanted
+    // t.deepEquals(
+    //   await simoleanIssuer.getAmountOf(aliceSimoleanPayout),
+    //   aliceProposal.want.Price,
+    // );
   
-    // Alice didn't get any of what Alice put in
-    t.deepEquals(await moolaIssuer.getAmountOf(aliceMoolaPayout), moola(0));
+    // // Alice didn't get any of what Alice put in
+    // t.deepEquals(await moolaIssuer.getAmountOf(aliceMoolaPayout), moola(0));
   
-    // Alice deposits her payout to ensure she can
-    await aliceMoolaPurse.deposit(aliceMoolaPayout);
-    await aliceSimoleanPurse.deposit(aliceSimoleanPayout);
+    // // Alice deposits her payout to ensure she can
+    // await aliceMoolaPurse.deposit(aliceMoolaPayout);
+    // await aliceSimoleanPurse.deposit(aliceSimoleanPayout);
   
-    // Bob deposits his original payments to ensure he can
-    await bobMoolaPurse.deposit(bobMoolaPayout);
-    await bobSimoleanPurse.deposit(bobSimoleanPayout);
+    // // Bob deposits his original payments to ensure he can
+    // await bobMoolaPurse.deposit(bobMoolaPayout);
+    // await bobSimoleanPurse.deposit(bobSimoleanPayout);
   
-    // Assert that the correct payouts were received.
-    // Alice had 3 moola and 0 simoleans.
-    // Bob had 0 moola and 7 simoleans.
-    t.equals(aliceMoolaPurse.getCurrentAmount().extent, 0);
-    t.equals(aliceSimoleanPurse.getCurrentAmount().extent, 7);
-    t.equals(bobMoolaPurse.getCurrentAmount().extent, 3);
-    t.equals(bobSimoleanPurse.getCurrentAmount().extent, 0);
+    // // Assert that the correct payouts were received.
+    // // Alice had 3 moola and 0 simoleans.
+    // // Bob had 0 moola and 7 simoleans.
+    // t.equals(aliceMoolaPurse.getCurrentAmount().extent, 0);
+    // t.equals(aliceSimoleanPurse.getCurrentAmount().extent, 7);
+    // t.equals(bobMoolaPurse.getCurrentAmount().extent, 3);
+    // t.equals(bobSimoleanPurse.getCurrentAmount().extent, 0);
 
 
 
