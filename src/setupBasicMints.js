@@ -6,7 +6,7 @@ const setup = () => {
   const moolaBundle = produceIssuer('moola');
   const simoleanBundle = produceIssuer('simoleans');
   const bucksBundle = produceIssuer('bucks');
-  const goodwillBundle = produceIssuer('goodwill');
+  const goodwillBundle = produceIssuer('Goodwill');
   const allBundles = {
     moola: moolaBundle,
     simoleans: simoleanBundle,

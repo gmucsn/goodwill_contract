@@ -22,49 +22,7 @@ import { setup } from '/Users/Shared/repos/smart_contracts/goodwill_contracts/sr
 // Let's make sure that the payment we would send to Alice has the
 // correct balance.
 test('Testing the goodwill exchange setup....', async (t) => {
-    //t.comment("Zoe initialized");
-    //const zoe = makeZoe({ require });
-    //const { zoe, installations } = await setupZoe();
-    //const inviteIssuer = zoe.getInviteIssuer();
-    //t.comment("Minting payments root...");
-    //const { source, moduleFormat } = await bundleSource(mintPaymentsRoot);
-
-    /////// Comment for mintpayment
-    // t.comment("Source bundled....");
-    // const installationHandle = await E(zoe).install(source, moduleFormat);
-    // const inviteIssuer = await E(zoe).getInviteIssuer();
-    // const getInstanceHandle = makeGetInstanceHandle(inviteIssuer);
-
-    // t.comment("Alice contract instance");
-    // // Alice creates a contract instance
-    // const adminInvite = await E(zoe).makeInstance(installationHandle);
-
-    // t.comment("Alice contract instance handle");
-    // const instanceHandle = await getInstanceHandle(adminInvite);
-
-    // t.comment("Bob sets up his stuff");
-    // // Bob wants to get 1000 tokens so he gets an invite and makes an
-    // // offer
-    // const { publicAPI } = await E(zoe).getInstanceRecord(instanceHandle);
-    // const invite = await E(publicAPI).makeInvite();
-    // t.comment("Bob has invite and is sending about to send an offer")
-    // t.ok(await E(inviteIssuer).isLive(invite), `valid invite`);
-    // const { payout: payoutP } = await E(zoe).offer(invite);
-
-    // // Bob's payout promise resolves
-    // const bobPayout = await payoutP;
-    // const bobTokenPayout = await bobPayout.Token;
-    // t.comment("Bob should have the ppayment now...");
-
-    // // Let's get the tokenIssuer from the contract so we can evaluate
-    // // what we get as our payout
-    // const tokenIssuer = await E(publicAPI).getTokenIssuer();
-    // const amountMath = await E(tokenIssuer).getAmountMath();
-
-    // const tokens1000 = await E(amountMath).make(1000);
-    // const tokenPayoutAmount = await E(tokenIssuer).getAmountOf(bobTokenPayout);
-    // t.comment("Bob now has this much: " + tokenPayoutAmount);
-    /////////end comment for mintpayment
+    
 
     ////////////////////////
     // Starting Atomic Swap Test
@@ -77,9 +35,9 @@ test('Testing the goodwill exchange setup....', async (t) => {
       simoleanMint,
       moola,
       simoleans,
-      // goodwillIssuer,
-      // goodwillMint,
-      // goodwill,
+      goodwillIssuer,
+      goodwillMint,
+      goodwill,
     } = setup();
     const zoe = makeZoe({ require });
     const inviteIssuer = zoe.getInviteIssuer();
@@ -92,6 +50,9 @@ test('Testing the goodwill exchange setup....', async (t) => {
     // Setup Alice
     const aliceMoolaPurse = moolaIssuer.makeEmptyPurse();
     const aliceMoolaPayment = moolaMint.mintPayment(moola(3));
+    const aliceGoodwillPurse = goodwillIssuer.makeEmptyPurse();
+    const aliceGoodwillPayment = goodwillMint.mintPayment(goodwill(3));
+    
     const aliceSimoleanPurse = simoleanIssuer.makeEmptyPurse();
     //const aliceGoodwillPurse = goodwillIssuer.makeEmptyPurse();
   
@@ -101,7 +62,7 @@ test('Testing the goodwill exchange setup....', async (t) => {
     //const bobGoodwillPayment = goodwillMint.mintPayment(goodwill(100));
     const bobMoolaPurse = moolaIssuer.makeEmptyPurse();
     const bobSimoleanPurse = simoleanIssuer.makeEmptyPurse();
-    //const bobGoodwillPurse = goodwillIssuer.makeEmptyPurse();
+    const bobGoodwillPurse = goodwillIssuer.makeEmptyPurse();
   
   
     // 1: Alice creates an atomicSwap instance
@@ -132,6 +93,11 @@ test('Testing the goodwill exchange setup....', async (t) => {
       alicePayments,
     );
   
+    t.comment("ALICE SIDE DONE");
+    t.comment("ALICE SIDE DONE");
+    t.comment("ALICE SIDE DONE");
+    t.comment("ALICE SIDE DONE");
+    t.comment("ALICE SIDE DONE");
     t.comment("ALICE SIDE DONE");
     // 4: Alice spreads the invite far and wide with instructions
     // on how to use it and Bob decides he wants to be the
