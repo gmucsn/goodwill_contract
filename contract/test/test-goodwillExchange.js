@@ -150,7 +150,8 @@ test('Testing the goodwill exchange setup....', async (t) => {
 
     t.comment("BOB really waiting for the payout");
     const bobPayout = await bobPayoutP;
-
+    console.log("BOB PAYOUT RETURNING");
+    console.log(bobPayout);
     // t.comment("Alice really waiting for the payout");
     // const alicePayout = await alicePayoutP;
   
