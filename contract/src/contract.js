@@ -18,6 +18,8 @@ export const makeContract = harden(zcf => {
   let adminOfferHandle;
   const tipAmountMath = zcf.getAmountMaths(harden(['Tip'])).Tip;
 
+  const helpers = makeZoeHelpers(zcf);
+
   const { inviteAnOffer, rejectOffer } = makeZoeHelpers(zcf);
 
   const updateNotification = () => {
@@ -29,6 +31,23 @@ export const makeContract = harden(zcf => {
     adminOfferHandle = offerHandle;
     return `admin invite redeemed`;
   };
+
+
+  const { issuer: goodwillIssuer, mint: goodwillMint, amountMath: goodwillAmountMath } = produceIssuer('goodwill');
+    
+    const goodwill1000 = goodwillAmountMath.make(1000);
+  
+    const giveGoodwill = (amount, recipientHandle) => {
+      const payment = goodwillMint.mintPayment(amount);
+      return helpers
+        .escrowAndAllocateTo({
+          amount,
+          payment,
+          keyword: 'Goodwill',
+          recipientHandle,
+        });
+    };
+  
 
   const encouragementHook = offerHandle => {
     // if the adminOffer is no longer active (i.e. the admin cancelled
@@ -68,12 +87,12 @@ export const makeContract = harden(zcf => {
   };
 
   const makeInvite = () =>
-    inviteAnOffer(
-      harden({
-        offerHook: encouragementHook,
-        customProperties: { inviteDesc: 'encouragement' },
-      }),
-    );
+            inviteAnOffer(
+              harden({
+                offerHook: encouragementHook,
+                customProperties: { inviteDesc: 'encouragement' },
+              }),
+            );
 
   return harden({
     invite: inviteAnOffer(
