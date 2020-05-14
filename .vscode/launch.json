@@ -9,7 +9,7 @@
         "type": "node",
         "request": "launch",
         "name": "Run Test",
-        "program": "${workspaceFolder}/test/goodwillExchange.test.js",
+        "program": "${workspaceFolder}/contract/test/test-goodwillExchange.js",
         "runtimeExecutable": "node",
         "runtimeArgs": [
             "-r", "esm"

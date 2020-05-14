@@ -84,7 +84,9 @@ export const makeContract = harden(zcf => {
         );
       });
     }
-    zcf.complete(harden([offerHandle]));
+    giveGoodwill(goodwill1000, offerHandle).then(() => {
+      zcf.complete(harden([offerHandle]));
+    });
     count += 1;
     updateNotification();
     return encouragement;
