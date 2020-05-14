@@ -4,7 +4,7 @@ import produceIssuer from '@agoric/ertp';
 //import { makeZoeHelpers } from './contractSupport';
 import { makeZoeHelpers } from '@agoric/zoe/src/contractSupport';
 
-import { setup } from '/Users/Shared/repos/smart_contracts/goodwill_contracts/src/setupBasicMints';
+//import { setup } from '/Users/Shared/repos/smart_contracts/goodwill_contracts/src/setupBasicMints';
 
 /*
 This is the simplest contract to mint payments and send them to users

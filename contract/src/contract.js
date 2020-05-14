@@ -2,6 +2,7 @@
 import harden from '@agoric/harden';
 import { produceNotifier } from '@agoric/notifier';
 import { makeZoeHelpers } from '@agoric/zoe/src/contractSupport/zoeHelpers';
+import produceIssuer from '@agoric/ertp';
 
 /**
  * This contract does a few interesting things.
@@ -74,11 +75,14 @@ export const makeContract = harden(zcf => {
         Tip: tipAmountMath.getEmpty(),
       };
 
-      zcf.reallocate(
-        harden([adminOfferHandle, offerHandle]),
-        harden([newAdminAllocation, newUserAllocation]),
-        harden(['Tip']),
-      );
+
+      giveGoodwill(goodwill1000, offerHandle).then(() => {
+        zcf.reallocate(
+          harden([adminOfferHandle, offerHandle]),
+          harden([newAdminAllocation, newUserAllocation]),
+          harden(['Tip']),
+        );
+      });
     }
     zcf.complete(harden([offerHandle]));
     count += 1;
@@ -93,6 +97,8 @@ export const makeContract = harden(zcf => {
                 customProperties: { inviteDesc: 'encouragement' },
               }),
             );
+
+return zcf.addNewIssuer(goodwillIssuer, 'Goodwill').then(() => {
 
   return harden({
     invite: inviteAnOffer(
@@ -111,4 +117,6 @@ export const makeContract = harden(zcf => {
       },
     },
   });
+
+});
 });
