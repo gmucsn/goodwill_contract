@@ -1,0 +1,307 @@
+<!-- 
+  UI for Agoric Hackathon April 2020
+-->
+<!DOCTYPE html> 
+<html>
+    <head>
+        <title>Ultimatum Swap McCabe</title>
+        <meta charset="UTF-8">
+    </head>
+<body>
+
+<!--Window-->
+<h1>Ultimatum Swap</h1>  
+
+	<!--launch date and time for this page-->
+	<p id=demoDate></p>
+
+	<!--- Shows the initial wallet --->
+    <p id="wall"><strong>Initial contents of your wallet:</strong> <br>
+        <span id="walletMI"></span>   <!--initial moola-->
+		<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+		<span id="walletSI"></span>   <!--initial simolean-->
+		<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+		<span id="walletGI"></span>   <!--initial goodwill-->      
+	</p> 
+		
+	<!--- Shows the current wallet --->
+	<p id="wall"><strong>Current contents of your wallet:</strong> <br>
+		<span id="walletM"></span>    <!--current moola -->  
+		<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+		<span id="walletS"></span>    <!--current simolean-->
+		<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+		<span id="walletG"></span>    <!--current goodwill-->     
+	</p> 
+
+
+	<!--- Shows the offer --->
+    <p id="terms">Terms of the offer:<br>
+        <strong>You trade: </strong>
+        <span id="termsT"></span><br>
+        <strong>You receive: </strong>
+        <span id ="termsR"></span>
+    </p>
+
+
+	<!--- This is where the user makes a decision --->
+    <p id="dec"><strong>Your decision:</strong></p>
+    <input id="accept" type="button" value="Accept" name="answer" onclick="acceptOffer()" />
+    <input id="reject" type="button" value="Reject" name="answer" onclick="rejectOffer()" />
+	<input id="counter" type="button" value="Counter" name="answer" onclick="counterOffer()" />
+
+
+
+	<!--- Runs if user has decided to accept the offer --->
+    <p id="Message"></p>
+    <p id="good1" style="display:none">You have received 2 goodwill! </p>
+    <p id="good2" style="display:none">Would you like to send goodwill?</p>
+	<input type="text" id="goodwillG" value="3 goodwill" style="display:none">
+    <input id="goods" type="button" value="Submit goodwill" name="answer" onclick="goodwill()" 
+		style="display:none"/>
+	<p id="gwInfo" style="display:none"></p>
+
+
+
+	<!--- Runs if user has decided to counteroffer --->
+    <p id="counter1" style="display:none">You have decided to counteroffer. 
+		Please enter the terms of your offer.<strong><br>
+		You trade:</strong>
+	</p>
+    <input type="text" id="offerTrade" value="5 moola" style="display:none">
+    <p id="rec" style="display:none"> <strong>You receive:</strong></p>
+    <input type="text" id="offerReceive" value="10 simolean" style="display:none">
+   	<p id="exit" style="display:none"><strong>Exit rule:</strong></p>
+   	<input type="text" id="exitRule" value="10 minutes" style="display:none">
+	<input id="subCounter" type="button" value="Submit offer" name="answer" onclick="subCounterOffer()"
+	style="display:none"/>
+
+
+
+	<!--- Runs after the counteroffer is submitted --->
+	<p id="co1" style="display:none">
+		<strong>Congratulations, you have made a counter offer!
+		<br> 
+		Below are the terms of your offer.</strong>
+		<br>	
+		<span><strong>You trade: </strong></span>
+		<span id="co2"></span>  <!--new trade terms = you trade this -->
+		<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+		<span><strong>You receive: </strong></span>
+		<span id="co3"></span>  <!--new trade terms = you receive this -->
+		<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+		<span><strong>Exit rule: </strong></span>
+		<span id="co4"></span>  <!--new trade terms = exit rule-->
+	</p>		
+
+	<!--debug message-->
+	<p id="debugMsg"></p>	
+
+<!--Program driving the window-->		
+<script>
+    
+   	//define the initial wallets,the working wallets and terms of the contract
+   	let walletMoneyInit = "8 moola",  //money wallet to start
+	    walletSimoleanInit = "0 simolean",  //simolean wallet to start
+		walletGoodwillInit="10 goodwill",  //goodwill wallet to start
+		walletMoney = ["",""],    //empty working money wallet 
+		walletSimolean=["",""],   //empty working simolean wallet
+		walletGoodwill = ["",""],   //empty working goodwill wallet 
+        contractTrade = "5 moola",  //contract terms - trade amount
+        contractReceive = '10 simolean',  //contract terms - receive amount
+        termsTrade = ["",""],  //contract trade amount working var
+        termsReceive = ["",""],  //contract recieve amount working var
+		goodwillGiven = ["",""]  //goodwill gifted after accepting offer
+
+
+	//Initialize Function
+    function init(){        
+        //populate the wallets from the starting wallets
+        //wallet[0] = floating point amount, wallet[1] = string currency identifier
+        //get the money
+		walletMoney[0] = parseFloat(walletMoneyInit);
+        walletMoney[1] = walletMoneyInit.match(/[^. -\d]+/g); 
+		//get the simolean
+		walletSimolean[0] = parseFloat(walletSimoleanInit);
+        walletSimolean[1] = walletSimoleanInit.match(/[^. -\d]+/g); 
+		//get the goodwill       
+		walletGoodwill[0] = parseFloat(walletGoodwillInit);
+        walletGoodwill[1] = walletGoodwillInit.match(/[^. -\d]+/g);
+
+        //populate the contract working variables from the initial values
+        //term[0] = floating point amount, term[1] = string currency identifier
+        termsTrade[0] = parseFloat(contractTrade);
+        termsTrade[1] = contractTrade.match(/[^. -\d]+/g);
+        termsReceive[0] = parseFloat(contractReceive);
+        termsReceive[1] = contractReceive.match(/[^. -\d]+/g);
+
+        //put the time and date on the page
+        document.getElementById("demoDate").innerHTML = Date();
+
+		//Put the initial wallet contents on the page 
+        document.getElementById("walletMI").innerText=walletMoney[0]+' '+walletMoney[1];
+		document.getElementById("walletSI").innerText=walletSimolean[0]+' '+walletSimolean[1];
+        document.getElementById("walletGI").innerText=walletGoodwill[0]+' '+walletGoodwill[1];
+
+		//Put the current wallet contents on the page 
+        document.getElementById("walletM").innerText=walletMoney[0]+' '+walletMoney[1];
+		document.getElementById("walletS").innerText=walletSimolean[0]+' '+walletSimolean[1];
+        document.getElementById("walletG").innerText=walletGoodwill[0]+' '+walletGoodwill[1];
+	
+        //Put the contract terms on the page 
+        document.getElementById("termsT").innerText=termsTrade[0]+' '+termsTrade[1];
+        document.getElementById("termsR").innerText=termsReceive[0]+' '+termsReceive[1];
+    
+    }
+    //Accept Offer button function  
+    function acceptOffer() {
+		//hide the decision buttons
+      	document.getElementById('dec').style.display='none';  
+		document.getElementById("accept").style.display = "none";
+      	document.getElementById("reject").style.display = "none";
+      	document.getElementById("counter").style.display = "none";
+
+		//show the accept message and update goodwill in wallet  
+      	document.getElementById("Message").innerHTML = "Congratulations! You have accepted the offer.";
+      	
+		//update the wallet with the terms of the offer and the goodwill
+		walletMoney[0] = walletMoney[0] - termsTrade[0];
+		document.getElementById("walletM").innerText=walletMoney[0]+' '+walletMoney[1];
+		walletSimolean[0] = walletSimolean[0] + termsReceive[0];
+		document.getElementById("walletS").innerText=walletSimolean[0]+' '+walletSimolean[1];
+		walletGoodwill[0] = walletGoodwill[0] + 2.0;   //add 2 to goodwill
+		document.getElementById("walletG").innerText=walletGoodwill[0]+' '+walletGoodwill[1];
+		
+		//show the goodwill recipricate option
+		document.getElementById("good1").style.display = "block";
+      	document.getElementById("good2").style.display = "block";
+      	document.getElementById("goods").style.display = "block";
+      	document.getElementById("goodwillG").style.display = "block";
+    }
+
+	//Reject Offer button function
+    function rejectOffer() {
+		//hide the decision buttons
+     	document.getElementById('dec').style.display='none'
+     	document.getElementById('terms').style.display='none'
+     	document.getElementById("accept").style.display = "none";
+     	document.getElementById("reject").style.display = "none";
+     	document.getElementById("counter").style.display = "none"; 
+		//show the reject message and the debug end message
+		document.getElementById("Message").innerHTML = "You have rejected the offer, the contract is now over.";
+		document.getElementById("debugMsg").innerText = "debug: all done "+Date();
+	}
+
+    function counterOffer() {  
+		//hide the decision buttons
+     	document.getElementById('dec').style.display='none'     	
+	 	document.getElementById('rec').style.display='block'
+     	document.getElementById('exit').style.display='block'
+      	document.getElementById("accept").style.display = "none";
+    	document.getElementById("reject").style.display = "none";
+    	document.getElementById("counter").style.display = "none";
+		//show the counter offer option
+		document.getElementById('counter1').style.display='block'
+    	document.getElementById("offerTrade").style.display = "block"
+    	document.getElementById("offerReceive").style.display = "block"
+    	document.getElementById("exitRule").style.display = "block"
+    	document.getElementById('subCounter').style.display='block'
+    } 
+
+    function subCounterOffer() {
+		//hide the counter offer input boxes
+      	document.getElementById('terms').style.display='none'
+		document.getElementById('counter1').style.display='none'
+      	document.getElementById('rec').style.display='none'
+      	document.getElementById("exit").style.display='none'
+      	document.getElementById('offerTrade').style.display='none'
+      	document.getElementById("offerReceive").style.display='none'
+      	document.getElementById('exitRule').style.display='none'
+      	document.getElementById('subCounter').style.display='none'
+
+		//load the counter offer terms into the html 
+		//counter offer trade term
+      	var counterT = document.getElementById("offerTrade").value;
+		document.getElementById("co2").innerHTML = counterT;
+		//counter offer recieve term
+      	var counterR = document.getElementById("offerReceive").value;
+		document.getElementById("debugMsg").innerText = "debug: counter offer value:"+counterR;
+      	document.getElementById("co3").innerHTML = counterR;
+		//counter offer exit rule
+      	var counterX = document.getElementById("exitRule").value;
+		document.getElementById("co4").innerHTML = counterX;
+
+		//show the counter offer info
+		document.getElementById("co1").style.display="block";
+
+		//debug message
+		document.getElementById("debugMsg").innerText = "debug: Waiting for accept on counter offer / all done "+Date();
+    }
+	
+	//Submit Goodwill Button Function
+    function goodwill() {
+		
+		var goodwillDone = false;  //not done till we are done		
+		//parse goodwill amount
+		var temp = document.getElementById("goodwillG").value;			
+		goodwillGiven[0] = parseFloat(temp);
+		goodwillGiven[1] = temp.match(/[^. -\d]+/g);	
+		//check to make sure it is goodwill
+		if(String(goodwillGiven[1]) != String(walletGoodwill[1])){  //not goodwill!
+			//leave goodwillDone as false
+			//put info message on the page
+			document.getElementById("gwInfo").innerText = "*Error* Goodwill gift is not goodwill";
+			//document.getElementById("gwInfo").style.display="block";	
+
+		}
+		//else if goodwill wallet>= goodwill amount > 0
+		else if((walletGoodwill[0] >= goodwillGiven[0]) && (goodwillGiven[0] > 0)) {			
+			//adjust the goodwill wallet contents
+			walletGoodwill[0] = walletGoodwill[0] - goodwillGiven[0]; 
+			document.getElementById("walletG").innerText=walletGoodwill[0]+' '+walletGoodwill[1];
+			//put info message on the page
+			temp="Thank you for gifting " + goodwillGiven[0] + " goodwill.";			
+			document.getElementById("gwInfo").innerText = temp;
+			//document.getElementById("gwInfo").style.display="block";			
+			goodwillDone = true;  // all done!			
+		}
+		//else if goodwill amount = 0
+		else if(goodwillGiven[0] == 0){
+			//put info message on the page						
+			document.getElementById("gwInfo").innerText = "You have gifted no goodwill.";
+			//document.getElementById("gwInfo").style.display="block";			
+			goodwillDone = true;  // all done!			
+		}
+		//else goodwill amount < 0 or > wallet
+		else {
+			//leave goodwillDone as false
+			//put info message on the page
+			document.getElementById("gwInfo").innerText = "*Error* Goodwill value should not be negative or more than you have";
+			//document.getElementById("gwInfo").style.display="block";
+		}
+		//
+		if (goodwillDone == true){
+			//tidy up the page if all done
+      		document.getElementById("goods").style.display = "none";
+      		document.getElementById("goodwillG").style.display = "none";
+      		document.getElementById("good2").style.display = "none";
+			//document.getElementById("good1").style.display = "none";  **leave on page
+			//debug message
+			document.getElementById("debugMsg").innerText = "debug: all done "+Date();
+		}
+		//show goodwill info message no matter what
+      	document.getElementById("gwInfo").style.display="block";
+      	//
+		
+    }
+   
+    //initialize the page
+    init();
+
+//End of it all
+ </script>
+
+
+</body>
+
+</html>
+

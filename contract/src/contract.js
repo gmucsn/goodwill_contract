@@ -34,20 +34,20 @@ export const makeContract = harden(zcf => {
   };
 
 
-  const { issuer: goodwillIssuer, mint: goodwillMint, amountMath: goodwillAmountMath } = produceIssuer('goodwill');
+  // const { issuer: goodwillIssuer, mint: goodwillMint, amountMath: goodwillAmountMath } = produceIssuer('goodwill');
     
-    const goodwill1000 = goodwillAmountMath.make(1000);
+  //   const goodwill1000 = goodwillAmountMath.make(1000);
   
-    const giveGoodwill = (amount, recipientHandle) => {
-      const payment = goodwillMint.mintPayment(amount);
-      return helpers
-        .escrowAndAllocateTo({
-          amount,
-          payment,
-          keyword: 'Goodwill',
-          recipientHandle,
-        });
-    };
+  //   const giveGoodwill = (amount, recipientHandle) => {
+  //     const payment = goodwillMint.mintPayment(amount);
+  //     return helpers
+  //       .escrowAndAllocateTo({
+  //         amount,
+  //         payment,
+  //         keyword: 'Goodwill',
+  //         recipientHandle,
+  //       });
+  //   };
   
 
   const encouragementHook = offerHandle => {
@@ -76,17 +76,16 @@ export const makeContract = harden(zcf => {
       };
 
 
-      giveGoodwill(goodwill1000, offerHandle).then(() => {
         zcf.reallocate(
           harden([adminOfferHandle, offerHandle]),
           harden([newAdminAllocation, newUserAllocation]),
           harden(['Tip']),
         );
-      });
+      
     }
-    giveGoodwill(goodwill1000, offerHandle).then(() => {
-      zcf.complete(harden([offerHandle]));
-    });
+    //giveGoodwill(goodwill1000, offerHandle).then(() => {
+    zcf.complete(harden([offerHandle]));
+    //});
     count += 1;
     updateNotification();
     return encouragement;
@@ -100,7 +99,7 @@ export const makeContract = harden(zcf => {
               }),
             );
 
-return zcf.addNewIssuer(goodwillIssuer, 'Goodwill').then(() => {
+//return zcf.addNewIssuer(goodwillIssuer, 'Goodwill').then(() => {
 
   return harden({
     invite: inviteAnOffer(
@@ -121,4 +120,4 @@ return zcf.addNewIssuer(goodwillIssuer, 'Goodwill').then(() => {
   });
 
 });
-});
+//});

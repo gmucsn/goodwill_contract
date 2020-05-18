@@ -45,6 +45,9 @@ export const makeContract = harden(
         } = zcf.getOffer(firstOfferHandle);
   
         return giveGoodwill(goodwill1000, firstOfferHandle).then(() => {
+          return giveGoodwill(goodwill1000, offerHandle).then(() => {
+
+
           return zcf.makeInvitation(
             offerHandle => {
               return giveGoodwill(goodwill1000, offerHandle)
@@ -58,6 +61,7 @@ export const makeContract = harden(
               },
             }),
           );
+          });
         });
       };
   
